@@ -73,7 +73,7 @@ bool DiveInScene::init()
 
     // add "HelloWorld" splash screen"
     auto bg = Sprite::create("gbg_2048x1536.png");
-    //sprite = Sprite::create("char_samso.png");
+    sprite = Sprite::create("char_samso.png");
 
     // position the sprite on the center of the screen
     //sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
