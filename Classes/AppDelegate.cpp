@@ -6,7 +6,7 @@ USING_NS_CC;
 AppDelegate::AppDelegate() {
 
 }
-
+ 
 AppDelegate::~AppDelegate() 
 {
 }
@@ -20,8 +20,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
         glview = GLView::create("DiveIn");
         director->setOpenGLView(glview);
     }
-    
-    director->setOpenGLView(glview);
+    else{
+        director->setOpenGLView(glview);
+    }
     
     // Set the design resolution
     glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);

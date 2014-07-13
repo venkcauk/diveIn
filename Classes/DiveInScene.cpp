@@ -62,7 +62,7 @@ bool DiveInScene::init()
     // add a label shows "Hello World"
     // create and initialize a label
     
-    auto label = LabelTTF::create("Hello World", "Arial", 24);
+    auto label = LabelTTF::create("Dive In to Swim", "Arial", 112);
     
     // position the label on the center of the screen
     label->setPosition(Vec2(origin.x + visibleSize.width/2,
@@ -72,12 +72,8 @@ bool DiveInScene::init()
     this->addChild(label, 1);
 
     // add "HelloWorld" splash screen"
-    auto bg = Sprite::create("gbg_2048x1536.png");
-    sprite = Sprite::create("char_samso.png");
-
-    // position the sprite on the center of the screen
-    //sprite->setPosition(Vec2(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-    //sprite->setPosition(origin.x, origin.y);
+    auto bg = Sprite::create("gamebg_00.png");
+    sprite = Sprite::create("samso.png");
     
     Shaky3D *shaky = Shaky3D::create(100.0f, Size(15,10), 5, false);
     auto gridNode = NodeGrid::create();
@@ -85,33 +81,17 @@ bool DiveInScene::init()
     gridNode->setAnchorPoint(Vec2(0,0));
     gridNode->setPosition(Vec2(0,0));
     
-    log("Before");
-    log("Grid contennt size width=%4.5f, height%4.5f",gridNode->getContentSize().width,gridNode->getContentSize().height);
-    
     sprite->setAnchorPoint(Vec2(0,0));
-    //sprite->setScale(0.5f);
     sprite->setPosition(Vec2(0,0));
-    
-    log("Sprite contennt size width=%4.5f, height%4.5f",sprite->getContentSize().width,sprite->getContentSize().height);
     
     bg->setAnchorPoint(Vec2(0,0));
     bg->setScale(0.5f);
     bg->setPosition(Vec2(0,0));
     
-     log("BG contennt size width=%4.5f, height%4.5f",bg->getContentSize().width,bg->getContentSize().height);
-    //this->addChild(bg);
-    
     gridNode->addChild(bg);
     bg->addChild(sprite);
     this->addChild(gridNode);
     
-    log("After");
-    log("Grid contennt size width=%4.5f, height%4.5f",gridNode->getContentSize().width,gridNode->getContentSize().height);
-    log("Sprite contennt size width=%4.5f, height%4.5f",sprite->getContentSize().width,sprite->getContentSize().height);
-     log("BG contennt size width=%4.5f, height%4.5f",bg->getContentSize().width,bg->getContentSize().height);
-
-    
-    //ypos = 0.0f;
     auto action = MoveBy::create(2, Point(700,700));
     sprite->runAction(action);
     
