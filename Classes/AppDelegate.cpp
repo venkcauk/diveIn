@@ -9,6 +9,7 @@ AppDelegate::AppDelegate() {
  
 AppDelegate::~AppDelegate() 
 {
+
 }
 
 bool AppDelegate::applicationDidFinishLaunching() {
@@ -64,7 +65,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto scene = DiveInScene::createScene();
     
     // initiate schedul. DiveInScene::run is main game loop.
-    scene->schedule(schedule_selector(DiveInScene::run), 0);
+    //scene->schedule(schedule_selector(DiveInScene::run), 0);
     
     // run
     director->runWithScene(scene);

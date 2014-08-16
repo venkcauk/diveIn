@@ -18,7 +18,7 @@ typedef struct tagResource
 static Resource smallResource = {cocos2d::Size(480, 320), "iPhone"};
 static Resource mediumResource = {cocos2d::Size(1024,768), "iPad"};
 static Resource largeResource = {cocos2d::Size(2048, 1536), "iPadHD"};
-static cocos2d::Size designResolutionSize = cocos2d::Size(2048, 1536);
+static cocos2d::Size designResolutionSize = cocos2d::Size(1024, 768);
 
 //auto fileUtils = cocos2d::FileUtils::getInstance;
 //std::vector<std::string> searchPath;

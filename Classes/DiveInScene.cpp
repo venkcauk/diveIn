@@ -1,17 +1,21 @@
 #include "DiveInScene.h"
+#include "CustomEvent.h"
 
 USING_NS_CC;
+
+DiveInScene::DiveInScene() {
+    
+    _playAgainListener = NULL;
+    _showLobbyListener = NULL;
+    _gameSummary = NULL;
+}
 
 Scene* DiveInScene::createScene()
 {
     // 'scene' is an autorelease object
     auto scene = Scene::create();
-    
-    // 'layer' is an autorelease object
-    auto layer = DiveInScene::create();
-
-    // add layer as a child to scene
-    scene->addChild(layer);
+	auto layer = DiveInScene::create();
+	scene->addChild(layer);
 
     // return the scene
     return scene;
@@ -26,9 +30,29 @@ bool DiveInScene::init()
     {
         return false;
     }
+
+	// create popup layer.
+	popupLayer = PopupLayer::create();
+	    
+	// create lobby layer.
+	lobbyLayer = LobbyLayer::create();
+
+	//create game layer.
+	gameLayer = GameLayer::create();
+
+    /* Add layer as a child to scene
+	*
+	*  PopupLayer->atIndex = 2;
+	*  LobbyLayer->atIndex = 1;
+	*  GameLayer->atIndex = 0;
+	*/
+    this->addChild(gameLayer);
+	this->addChild(lobbyLayer);
+	this->addChild(popupLayer);
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    _eventDispatcher = Director::getInstance()->getEventDispatcher();
 
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
@@ -62,51 +86,131 @@ bool DiveInScene::init()
     // add a label shows "Hello World"
     // create and initialize a label
     
-    auto label = LabelTTF::create("Dive In to Swim", "Arial", 112);
+    auto label = LabelTTF::create("Dive In to Swim", "Helvetica", 75);
+	label->setColor(Color3B::BLACK);
     
     // position the label on the center of the screen
-    label->setPosition(Vec2(origin.x + visibleSize.width/2,
+	label->setPosition(Vec2(origin.x + visibleSize.width/2,
                             origin.y + visibleSize.height - label->getContentSize().height));
 
     // add the label as a child to this layer
-    this->addChild(label, 1);
+    //this->addChild(label, 1);
+    
+    // Add custom event.
+    
+    // #1 DiveIn
+    if(_playAgainListener == NULL)
+    {
+        _playAgainListener = EventListenerCustom::create(EVENT_TYPE_DIVEIN_TRIGGRED, [=](EventCustom* event){
+            DiveInScene::onDiveInTriggred(event);
+        });
+        _eventDispatcher->addEventListenerWithFixedPriority(_playAgainListener, 1);
+    }
+    
+    // #9 Option
+    auto _optionListener = EventListenerCustom::create(EVENT_TYPE_OPTION_TRIGGRED, [=](EventCustom* event){
+        DiveInScene::onOptionTriggred(event);
+    });
+    
+    _eventDispatcher->addEventListenerWithFixedPriority(_optionListener, 1);
 
-    // add "HelloWorld" splash screen"
-    auto bg = Sprite::create("gamebg_00.png");
-    sprite = Sprite::create("samso.png");
-    
-    Shaky3D *shaky = Shaky3D::create(100.0f, Size(15,10), 5, false);
-    auto gridNode = NodeGrid::create();
-    gridNode->runAction(shaky);
-    gridNode->setAnchorPoint(Vec2(0,0));
-    gridNode->setPosition(Vec2(0,0));
-    
-    sprite->setAnchorPoint(Vec2(0,0));
-    sprite->setPosition(Vec2(0,0));
-    
-    bg->setAnchorPoint(Vec2(0,0));
-    bg->setScale(0.5f);
-    bg->setPosition(Vec2(0,0));
-    
-    gridNode->addChild(bg);
-    bg->addChild(sprite);
-    this->addChild(gridNode);
-    
-    auto action = MoveBy::create(2, Point(700,700));
-    sprite->runAction(action);
-    
 
+    // initiate schedul. DiveInScene::run is main game loop.
+    //this->getScene()->schedule(schedule_selector(GameLayer::run), 0);
+    
     return true;
 }
 
-void DiveInScene::run(float deltaTime)
+void DiveInScene::update(float deltaTime)
 {
-    //float ypos = sprite->getPosition().y;
-    //ypos++;
-   // auto pt = sprite->getPosition();
-    //pt.y++;
-    //sprite->setPosition(pt);
+    if(gameLayer != NULL)
+    {
+        if(gameLayer->isRunning)
+        {
+            gameLayer->update(deltaTime);
+        }
+    }
+}
+
+void DiveInScene::setVisibelState(STATE state)
+{
+	log("DiveIn Scene setVisible ");
+	CURRENT_STATE = state;
+	switch (CURRENT_STATE)
+	{
+	case LOBBY:
+		lobbyLayer->setVisible(true);
+		gameLayer->setVisible(false);
+		popupLayer->setVisible(true);
+		break;
+
+	case POPUP:
+		lobbyLayer->setVisible(true);
+		popupLayer->setVisible(true);
+		gameLayer->setVisible(false);
+		break;
+
+	case GAME:
+		lobbyLayer->setVisible(false);
+		popupLayer->setVisible(false);
+		gameLayer->setVisible(true);
+        break;
+
+	default:
+		break;
+	}
+}
+
+void DiveInScene::onOptionTriggred(EventCustom* event)
+{
+    log("on Option triggred");
+    int *data = static_cast<int*>(event->getUserData());
+    log("Command received SHOW/CLOSE option popup %d",*data);
+    popupLayer->showPopup(PopupLayer::POPUP_TYPE::OPTIONS);
+}
+
+void DiveInScene::onDiveInTriggred(EventCustom* event)
+{
+    log("Command received SHOW/CLOSE DiveIn Game Screen");
+    popupLayer->setVisible(false);
+    lobbyLayer->setVisible(false);
+   
+    if(!gameLayer->isInititalGFXCreated)
+        gameLayer->initGraphics();
     
+    if(gameLayer->isRunning)
+    {
+        gameLayer->stop();
+        gameLayer->clear();
+    }
+    
+    if(_gameSummary == NULL) {
+        _gameSummary = EventListenerCustom::create(EVENT_TYPE_GAME_SUMMARY, [=](EventCustom* event){
+            DiveInScene::onGameSummaryTriggred(event);
+        });
+        _eventDispatcher->addEventListenerWithFixedPriority(_gameSummary, 1);
+    }
+    
+    gameLayer->start();
+    gameLayer->setVisible(true);
+    this->unscheduleUpdate();
+    this->scheduleUpdate();
+}
+
+void DiveInScene::onGameSummaryTriggred(EventCustom* event) {
+
+   // int *data = static_cast<int*>(event->getUserData());
+   // popupLayer->gameSummaryData = data;
+    popupLayer->setVisible(true);
+    popupLayer->showPopup(PopupLayer::POPUP_TYPE::GAME_SUMMARY);
+    
+    if(_showLobbyListener == NULL)
+    {
+        _showLobbyListener = EventListenerCustom::create(EVENT_TYPE_SHOW_LOBBY, [=](EventCustom* event){
+            DiveInScene::setVisibelState(STATE::LOBBY);
+        });
+        _eventDispatcher->addEventListenerWithFixedPriority(_showLobbyListener, 1);
+    }
 }
 
 
