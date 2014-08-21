@@ -25,6 +25,8 @@ private:
     
 public:
     
+    static int ACTIVE_COIN_COUNT;
+    
     enum ITEM_ID {
         COINS = 1,
         TREASURE,
@@ -50,6 +52,11 @@ public:
     FloatingItems();
     FloatingItems(cocos2d::Layer* parent, ITEM_ID id, bool collectable);
     
+    float _initXpos;
+    float _initYpos;
+    void setPositionX(float x);
+    void setPositionY(float y);
+    
     void setCoins();
     void setPearl();
     void setTreasure();
@@ -61,5 +68,7 @@ public:
     bool reset();
     void dispose();
 };
+
+//int FloatingItems::ACTIVE_COIN_COUNT = 0;
 
 #endif /* defined(__diveIn__FloatingItems__) */

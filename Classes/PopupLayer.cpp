@@ -83,7 +83,7 @@ void PopupLayer::showPopup(POPUP_TYPE popupID)
 			itemSelectionLayer->setVisible(true);
 			break;
 		case PopupLayer::GAME_SUMMARY:
-            //gameSummaryLayer->setData(gameSummaryData);
+            gameSummaryLayer->setData(gameSummaryData);
 			gameSummaryLayer->setVisible(true);
 			break;
 		case PopupLayer::INAPP_PURCHASE:

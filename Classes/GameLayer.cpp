@@ -1,16 +1,23 @@
 #include "GameLayer.h"
 #include "cocos2d.h"
 #include "CustomEvent.h"
+#include "GameSummaryData.h"
 
 USING_NS_CC;
+
+
+int GameLayer::GAME_SPEED_LEVEL = 2;
 
 GameLayer::GameLayer()
 {
     _touchListener = NULL;
+    _pearl = NULL;
+    _doubleUp = NULL;
     _isTouchBegan = false;
     isRunning = false;
     _meterCovered = 0.0f;
     isInititalGFXCreated = false;
+    _isDoubleUpMode = false;
     
     collectedCoinCount = 0;
     collectedPearlCount = 0;
@@ -203,13 +210,33 @@ void GameLayer::setFloatings() {
         auto coin = new FloatingItems(this, FloatingItems::ITEM_ID::COINS, true);
         
         if(i==0)
-            coin->image->setPosition(Vec2(xpos, ypos));
+            coin->setPositionX(xpos);
         else
-            coin->image->setPosition(Vec2(xOffSet, ypos));
-        
+            coin->setPositionX(xOffSet);
+
+        coin->setPositionY(ypos);
+
         xOffSet = coin->image->getPositionX() + 33;
         _coinsList[i] = coin;
-    } //return;
+        coin->ACTIVE_COIN_COUNT = (i+1);
+    }
+    
+    if(_pearl == NULL) {
+        
+        _pearl = new FloatingItems(this, FloatingItems::ITEM_ID::PEARL, true);
+        xpos = (arc4random()% int(_visibleSize.width*.5f)) +_visibleSize.width;
+        ypos = (arc4random()% int(_visibleSize.height*.10f)) + 100;
+        _pearl->setPositionX(xpos);
+        _pearl->setPositionY(ypos);
+    }
+    
+    if(_doubleUp == NULL) {
+        _doubleUp = new FloatingItems(this, FloatingItems::ITEM_ID::DOUBLE_UP, true);
+        xpos = (arc4random()% int(_visibleSize.width*.5f)) +_visibleSize.width;
+        ypos = (arc4random()% int(_visibleSize.height*.10f)) + 100;
+        _doubleUp->setPositionX(xpos);
+        _doubleUp->setPositionY(ypos);
+    }
     
     xOffSet = 0;
     auto ENEMY_COUNT = 3;
@@ -235,9 +262,6 @@ void GameLayer::setFloatings() {
     
     _activeEnemyList[0] = arc4random()%(ENEMY_COUNT*2);
     _activeEnemyList[1] = arc4random()%(ENEMY_COUNT*2);
-    
-    
-    
 }
 
 void GameLayer::setHuds() {
@@ -256,27 +280,52 @@ void GameLayer::setHuds() {
     coinCount->setPosition(Vec2(_visibleOrigin.x + (_visibleSize.width * .80f),_visibleOrigin.y + (_visibleSize.height * .93f)));
     this->addChild(coinCount);
     
-    auto coinIcon = Sprite::create("coll_coin_1.png");
+    auto coinIcon = Sprite::create("coin2.png");
     coinIcon->setAnchorPoint(Vec2(0,0));
     coinIcon->setPosition(Vec2(coinCount->getPositionX() + coinCount->getContentSize().width + 2,coinCount->getPositionY() - coinCount->getContentSize().height * .15f));
-    coinIcon->setScale(2);
+    //coinIcon->setScale(2);
     this->addChild(coinIcon);
+    
+    _doubleUpMeter = Sprite::create();
+    _doubleUpMeter->setAnchorPoint(Vec2(0, 0));
+    _doubleUpMeter->setPosition((_visibleSize.width * .36f), (_visibleSize.height));
+    this->addChild(_doubleUpMeter);
+    
+    _dblUpFiller = Sprite::create("slider_01.png");
+    _dblUpFiller->setAnchorPoint(Vec2(0, 0));
+    _dblUpFiller->setScaleX(1.2f);
+    _dblUpFiller->setPosition(Vec2((_visibleSize.width * .07f), (_visibleSize.height * .02f)));
+    _doubleUpMeter->addChild(_dblUpFiller);
+    
+    auto dblUpBG = Sprite::create("slider_00.png");
+    dblUpBG->setAnchorPoint(Vec2(0, 0));
+    dblUpBG->setPosition(Vec2(0, 0));
+    _doubleUpMeter->addChild(dblUpBG);
+    
+    setDoubleUpEnable(false);
+
 }
 
 void GameLayer::start()
 {
     log("DiveIn Game Start");
     isRunning =true;
+    _samsa->setVisible(true);
     
     _meterCovered = 0;
+    collectedCoinCount = 0;
+    collectedPearlCount = 0;
     
-    for (int i=2; i>=0; i--) {
+    stopParallex();
+    
+    /*for (int i=2; i>=0; i--) {
         for (int j=1; j>=0; j--) {
             auto platform = (Sprite*)_platformArray[i][j];
-            auto moveAction = MoveBy::create((i+6), Point(-1024, platform->getPositionY()));
-            platform->runAction(RepeatForever::create(Sequence::create(moveAction, NULL)));
+            platform->setPositionX(_visibleSize.width*(j));
         }
-    }
+    }*/
+    
+    startParallex(true);
     
     if(_touchListener == NULL)
     {
@@ -339,7 +388,74 @@ void GameLayer::touchCancelled(Touch* touch, Event* event) {
 
 void GameLayer::stop()
 {
+    GAME_SPEED_LEVEL = 2;
+    _samsa->setVisible(false);
+    setDoubleUpEnable(false);
+    
     log("Divein Game Stop");
+    stopParallex();
+    
+    int activeEnemyID = 0;
+    FloatingItems* enemy;
+    
+    for(int i =0; i<2; i++) {
+        activeEnemyID = _activeEnemyList[i];
+        enemy = _killerFishList[activeEnemyID];
+        enemy->reset();
+    }
+    
+    if(_pearl != NULL) {
+        _pearl->setPositionX((arc4random()% int(_visibleSize.width*.5f)) +_visibleSize.width);
+        _pearl->setPositionY((arc4random()% int(_visibleSize.height*.30f)));
+        _pearl->image->setVisible(true);
+    }
+    
+    resetCoins();
+
+}
+
+void GameLayer::resetCoins() {
+    
+    FloatingItems::ACTIVE_COIN_COUNT = 0;
+    float ypos = (arc4random()% int(_visibleSize.height*.5f)) +(100);
+    for (int i=0; i<10; i++) {
+        //
+        auto coin = _coinsList[i];
+        coin->reset();
+        coin->setPositionY(ypos);
+        coin->image->setVisible(true);
+        //coin->setActiveCoinCount(i+1);
+        coin->ACTIVE_COIN_COUNT = (i+1);
+    }
+    
+}
+
+void GameLayer::startParallex(bool resetPosition) {
+    
+    int speedRate = 6 / GAME_SPEED_LEVEL;
+    
+    for (int i=2; i>=0; i--) {
+        for (int j=1; j>=0; j--) {
+            auto platform = (Sprite*)_platformArray[i][j];
+            
+            if (resetPosition) {
+                platform->setPositionX(_visibleSize.width*(j));
+            }
+            
+            auto moveAction = MoveBy::create((i+speedRate), Point(-1024, platform->getPositionY()));
+            platform->runAction(RepeatForever::create(Sequence::create(moveAction, NULL)));
+        }
+    }
+}
+
+void GameLayer::stopParallex() {
+    
+    for (int i=2; i>=0; i--) {
+        for (int j=1; j>=0; j--) {
+            auto platform = (Sprite*)_platformArray[i][j];
+            platform->stopAllActions();
+        }
+    }
 }
 
 void GameLayer::pause()
@@ -358,6 +474,28 @@ void GameLayer::update(float dt)
     
     if(isRunning)
         run(dt);
+}
+
+
+void GameLayer::setDoubleUpEnable(bool enable) {
+    
+    if(enable) {
+        _isDoubleUpMode = true;
+        _doubleUpMeter->stopAllActions();
+        _doubleMeterAction = MoveTo::create(.2f, Vec2((_visibleSize.width * .36f), (_visibleSize.height * .85f)));
+        _doubleUpMeter->runAction(_doubleMeterAction);
+        _dblUpFiller->stopAllActions();
+        _dblUpFiller->setScaleX(1.2f);
+        _dblFillerAction = ScaleTo::create(7, 0.0f, 1.0f);
+        _dblUpFiller->runAction(_dblFillerAction);
+        //_dblUpFiller->runAction(Sequence::create(_dblFillerAction,CallFunc::initWithTarget(GameLayer::onDblFillScaleDownFinished),NULL));
+    }
+    else {
+        _isDoubleUpMode = false;
+        _doubleUpMeter->stopAllActions();
+        _doubleMeterAction = MoveTo::create(.2f, Vec2((_visibleSize.width * .36f), (_visibleSize.height)));
+        _doubleUpMeter->runAction(_doubleMeterAction);
+    }
 }
 
 void GameLayer::run(float deltaTime)
@@ -393,6 +531,8 @@ void GameLayer::run(float deltaTime)
         _isLand->setPositionX(maxWidth);
     }
     
+    // Layout collision for platform's
+    // If the platform x position less than the visible origin then remove it and add to the visible content width.
     for (int i=2; i>=0; i--) {
         for (int j=1; j>=0; j--) {
             auto platform = (Sprite*)_platformArray[i][j];
@@ -420,16 +560,53 @@ void GameLayer::run(float deltaTime)
 
     }
     
+    if(_isDoubleUpMode){
+        if(_dblUpFiller->getScaleX() <.01f)
+        {
+            setDoubleUpEnable(false);
+        }
+    }
+    
+    if(_doubleUp != NULL && !_isDoubleUpMode) {
+        _doubleUp->run(deltaTime);
+        if(_doubleUp->checkCollision(_samsa)) {
+            //collectedPearlCount += 1; //Enable 2x meter.
+            setDoubleUpEnable();
+        }
+    }
+
+    
     for (int i=0; i<10; i++) {
         //
         auto coin = _coinsList[i];
         coin->run(deltaTime);
         
         if(coin->checkCollision(_samsa)) {
-            collectedCoinCount+=1;
+            
+            if(_isDoubleUpMode)
+                collectedCoinCount+=2;
+            else
+                collectedCoinCount+=1;
+            
             coinCount->setString(std::to_string(collectedCoinCount));
         }
+        
+         int activeCointCount = coin->ACTIVE_COIN_COUNT;
+        
+        //if(coin->getActiveCointCount() <= 0)
+        if(activeCointCount<= 1)
+        {
+            resetCoins();
+        }
     }
+    coinCount->setString(std::to_string(collectedCoinCount));
+    
+     if(_pearl != NULL) {
+         _pearl->run(deltaTime);
+         if(_pearl->checkCollision(_samsa)) {
+             collectedPearlCount += 1;
+         }
+     }
     
     int activeEnemyID = 0;
     FloatingItems* enemy;
@@ -446,19 +623,38 @@ void GameLayer::run(float deltaTime)
             _activeEnemyList[i] = arc4random()%6; // total killerFish
             enemy = _killerFishList[_activeEnemyList[i]];
             EventCustom event(EVENT_TYPE_GAME_SUMMARY);
-            //int* data[] = {collectedTreasureCount};
-            //data[0] = collectedCoinCount;
-            //data[1] = collectedPearlCount;
-            //data[2] = collectedTreasureCount;
-            //event.setUserData(data);
+            int totalMeters = _meterCovered;
+            GameSummaryData *data = new GameSummaryData(totalMeters, collectedCoinCount, collectedPearlCount);
+            event.setUserData(data);
             _eventDispatcher->dispatchEvent(&event);
-            
+            stop();
+            return; // Stop executing the run method from here.
         }
     }
     
-    _meterCovered += .05f;
+    _meterCovered += (.05f) * GAME_SPEED_LEVEL;
     int totalMeter = _meterCovered;
     _meters->setString(std::to_string(totalMeter).append(" M"));
+    
+    bool isLevelIncreased = false;
+    
+    if(_meterCovered >50 && _meterCovered < 200 && GAME_SPEED_LEVEL < 2) {
+        GAME_SPEED_LEVEL = 3;
+        isLevelIncreased = true;
+    }
+    else if(_meterCovered >200 && _meterCovered < 400 && GAME_SPEED_LEVEL < 3) {
+        GAME_SPEED_LEVEL = 4;
+        isLevelIncreased = true;
+    }
+    else if(_meterCovered >400 && _meterCovered < 600 && GAME_SPEED_LEVEL < 4) {
+        GAME_SPEED_LEVEL = 4.5;
+        isLevelIncreased = true;
+    }
+    
+    if(isLevelIncreased) {
+        stopParallex();
+        startParallex();
+    }
 }
 
 Sprite* GameLayer::getSamsa() {

@@ -7,8 +7,11 @@
 //
 
 #include "FloatingItems.h"
+#include "GameLayer.h"
 
 USING_NS_CC;
+
+int FloatingItems::ACTIVE_COIN_COUNT = 0;
 
 FloatingItems::FloatingItems() {
     
@@ -80,6 +83,24 @@ void FloatingItems::setCoins() {
 
 void FloatingItems::setPearl() {
     
+    char name[50] = {0};
+    Vector<SpriteFrame*> pearlFrame(12);
+    image = Sprite::create();
+    
+    for(int i=1; i<13; i++) {
+        sprintf(name, "coll_pearl_%d.png", i);
+        auto frame = SpriteFrame::create(name, Rect(0, 0, 58, 58));
+        pearlFrame.pushBack(frame);
+    }
+    
+    auto animation = Animation::createWithSpriteFrames(pearlFrame, .08f);
+    auto animate = Animate::create(animation);
+    image->runAction(RepeatForever::create(animate));
+    
+    image->setAnchorPoint(Vec2(0, 0));
+    image->setPosition(Vec2(0, 0));
+    _parent->addChild(image);
+
 }
 
 void FloatingItems::setTreasure() {
@@ -130,6 +151,23 @@ void FloatingItems::setEnemy() {
 
 void FloatingItems::setDoubleUp() {
     
+    char name[50] = {0};
+    Vector<SpriteFrame*> dblUpFrame(10);
+    image = Sprite::create();
+    
+    for(int i=1; i<11; i++) {
+        sprintf(name, "coll_coin2x_%d.png", i);
+        auto frame = SpriteFrame::create(name, Rect(0, 0, 58, 58));
+        dblUpFrame.pushBack(frame);
+    }
+    
+    auto animation = Animation::createWithSpriteFrames(dblUpFrame, .08f);
+    auto animate = Animate::create(animation);
+    image->runAction(RepeatForever::create(animate));
+    
+    image->setAnchorPoint(Vec2(0, 0));
+    image->setPosition(Vec2(0, 0));
+    _parent->addChild(image);
 }
 
 bool FloatingItems::reset() {
@@ -139,7 +177,21 @@ bool FloatingItems::reset() {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     
     _isCollected = false;
-    xpos = visibleSize.width + 100;
+    
+    if(itemID == ITEM_ID::COINS)
+    {
+        xpos = _initXpos;
+        
+        int activeCointCount = ACTIVE_COIN_COUNT;
+        if(activeCointCount > 0)
+            activeCointCount--;
+        
+        ACTIVE_COIN_COUNT = activeCointCount;
+        image->setVisible(false);
+    }
+    else
+        xpos = visibleSize.width + 100;
+    
     image->setPositionX(xpos);
         
     if(itemID > ITEM_ID::TREASURE && itemID < ITEM_ID::DOUBLE_UP)
@@ -148,6 +200,10 @@ bool FloatingItems::reset() {
         ypos = arc4random()% maxHeight;
         ypos += 100;
         image->setPositionY(ypos);
+    }
+    else if(itemID == PEARL)
+    {
+        ypos = _initYpos;
     }
     return true;
 }
@@ -158,9 +214,24 @@ void FloatingItems::dispose() {
 
 bool FloatingItems::checkCollision(Sprite* target) {
 
+    if(!image->isVisible())
+        return false;
+    
     bool isCollisionOccured = false;
-    Rect floaterRect = *new Rect(image->getPositionX(), image->getPositionY(), image->getContentSize().width/3, image->getContentSize().height/2);
-    Rect samsaRewct = *new Rect(target->getPositionX()+(target->getContentSize().width/2), target->getPositionY(), target->getContentSize().width/3, target->getContentSize().height/2);
+    Rect floaterRect;
+    Rect samsaRewct;
+    
+    if(itemID > ITEM_ID::TREASURE && itemID < ITEM_ID::DOUBLE_UP) {
+        floaterRect = *new Rect(image->getPositionX(), image->getPositionY(), image->getContentSize().width/3, image->getContentSize().height/2);
+        samsaRewct = *new Rect(target->getPositionX()+(target->getContentSize().width/2), target->getPositionY(), target->getContentSize().width/3, target->getContentSize().height/2);
+    }
+    else {
+        floaterRect = *new Rect(image->getPositionX(), image->getPositionY(), image->getContentSize().width, image->getContentSize().height);
+        samsaRewct = *new Rect(target->getPositionX(), target->getPositionY(), target->getContentSize().width, target->getContentSize().height);
+    }
+    
+    
+    
     
     if(samsaRewct.intersectsRect(floaterRect) && !_isCollected)
     {
@@ -195,9 +266,24 @@ void FloatingItems::updateHUDByItems(ITEM_ID id) {
 
 void FloatingItems::run(float deltaTime) {
 
+    if(!image->isVisible())
+        return;
+    
     float xpos = image->getPositionX();
-    xpos -=3;
+    xpos -=(3 * GameLayer::GAME_SPEED_LEVEL);
     
     image->setPositionX(xpos);
+}
+
+void FloatingItems::setPositionX(float xpos) {
+    if(image!= NULL)
+        image->setPositionX(xpos);
+    _initXpos = xpos;
+}
+
+void FloatingItems::setPositionY(float ypos) {
+    if(image!= NULL)
+        image->setPositionY(ypos);
+    _initYpos=ypos;
 }
 

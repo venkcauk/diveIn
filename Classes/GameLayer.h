@@ -13,23 +13,28 @@ private:
     
     cocos2d::Sprite* _isLand;
     cocos2d::Sprite* _bg;
+    cocos2d::Sprite* _doubleUpMeter;
+    cocos2d::Sprite* _dblUpFiller;
+    
 
    // cocos2d::Vector<cocos2d::Sprite*> _platforms;
     cocos2d::Sprite* _platformArray[3][2];
     
     // floating vars
     FloatingItems* _coinsList[10];
-    cocos2d::Sprite* _treasure;
-    cocos2d::Sprite* _pearl;
     FloatingItems* _killerFishList[6];
     cocos2d::Sprite* _cloudList[4];
     
     // game charecter samsa
     cocos2d::Sprite* _samsa;
+    FloatingItems* _pearl;
+    FloatingItems* _doubleUp;
     
     //jump action
     cocos2d::MoveTo* _samsaMoveToAction;
     cocos2d::MoveTo* _samsaSettleAction;
+    cocos2d::MoveTo* _doubleMeterAction;
+    cocos2d::ScaleTo* _dblFillerAction;
     
     cocos2d::LabelTTF* _meters;
     
@@ -37,10 +42,13 @@ private:
     void setPlatform();
     void setFloatings();
     void setHuds();
+    void setDoubleUp();
+    void setDoubleUpEnable(bool enable = true);
     
     cocos2d::EventListenerTouchOneByOne* _touchListener;
     
     bool _isTouchBegan;
+    bool _isDoubleUpMode;
     double _meterCovered;
     int _activeEnemyList[2];
     float _samsoMaxOnY;
@@ -48,6 +56,7 @@ private:
 public:
     
     static float COIN_OFFSET_X;
+    static int GAME_SPEED_LEVEL;
     
     bool isInititalGFXCreated;
     bool isRunning;
@@ -89,6 +98,10 @@ public:
     void resume();
     void stop();
     void clear();
+    
+    void resetCoins();
+    void startParallex(bool resetPosition = false);
+    void stopParallex();
 
 	//~GameLayer();
 

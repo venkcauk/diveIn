@@ -1,6 +1,7 @@
 #include "GameSummaryLayer.h"
 #include "cocos2d.h"
 #include "CustomEvent.h"
+#include "GameSummaryData.h"
 
 USING_NS_CC;
 
@@ -24,48 +25,54 @@ bool GameSummaryLayer::init()
 
 	auto bg = Sprite::create("Summary_popup.png");
 	bg->setAnchorPoint(Vec2(0,0));
-	bg->setPosition(Vec2(220,225));
+	bg->setPosition(Vec2(visibleSize.width*.16f,visibleSize.height*.30f));
 	bg->setScale(1.75f);
 	this->addChild(bg);
 
 	auto playAgainItem = MenuItemImage::create("summary_button.png","summary_button01.png",CC_CALLBACK_1(GameSummaryLayer::onPlayAgain, this));
 	playAgainItem->setAnchorPoint(Vec2(0,0));
-	playAgainItem->setPosition(Vec2(bg->getContentSize().width - 100,bg->getContentSize().height - 10));
+	playAgainItem->setPosition(Vec2(bg->getContentSize().width - 165,bg->getContentSize().height - 10));
 	playAgainItem->setScale(1.75f);
 	
 	auto homeAgainItem = MenuItemImage::create("summary_button.png","summary_button01.png",CC_CALLBACK_1(GameSummaryLayer::onHomeAgain, this));
 	homeAgainItem->setAnchorPoint(Vec2(0,0));
-	homeAgainItem->setPosition(Vec2(bg->getContentSize().width + 200,bg->getContentSize().height - 10));
+	homeAgainItem->setPosition(Vec2(bg->getContentSize().width + 135,bg->getContentSize().height - 10));
 	homeAgainItem->setScale(1.75f);
 	
 	auto titlLabel = LabelTTF::create("DiveIn", "Futura-CondensedExtraBold", 30);
 	titlLabel->setAnchorPoint(Vec2(0,0));
-	titlLabel->setPosition(Vec2(bg->getContentSize().width/2 - 50,bg->getContentSize().height - 34));
+	titlLabel->setPosition(Vec2(bg->getContentSize().width/2 - 50,(bg->getContentSize().height * .78f)));
 	bg->addChild(titlLabel);
 
 	_meterLabel = LabelTTF::create("320 M", "Futura-CondensedExtraBold", 27);
 	_meterLabel->setAnchorPoint(Vec2(0,0));
-	_meterLabel->setPosition(Vec2(bg->getContentSize().width/2 - 50,bg->getContentSize().height - 85));
+	_meterLabel->setPosition(Vec2(bg->getContentSize().width/2 - 75, (bg->getContentSize().height * .58f)));
 	_meterLabel->setColor(Color3B::BLACK);
 	bg->addChild(_meterLabel);
 
     _earnedCoinsLabel = LabelTTF::create("Earned", "Futura-CondensedExtraBold", 22);
 	_earnedCoinsLabel->setAnchorPoint(Vec2(0,0));
-	_earnedCoinsLabel->setPosition(Vec2(bg->getContentSize().width/2 - 100,bg->getContentSize().height - 140));
+	_earnedCoinsLabel->setPosition(Vec2(bg->getContentSize().width/2,(bg->getContentSize().height * .40f)));
 	_earnedCoinsLabel->setColor(Color3B::BLACK);
 	bg->addChild(_earnedCoinsLabel);
+    
+    _earnedPearlLabel = LabelTTF::create("Earned", "Futura-CondensedExtraBold", 22);
+	_earnedPearlLabel->setAnchorPoint(Vec2(0,0));
+	_earnedPearlLabel->setPosition(Vec2(bg->getContentSize().width/2,(bg->getContentSize().height * .10f)));
+	_earnedPearlLabel->setColor(Color3B::BLACK);
+	bg->addChild(_earnedPearlLabel);
 
-	auto coins = Sprite::create("coll_coin_1.png");
+	auto coins = Sprite::create("coin2.png");
 	coins->setAnchorPoint(Vec2(0,0));
-	coins->setPosition(Vec2(bg->getContentSize().width/2 - 20,bg->getContentSize().height - 140));
-	//coins->setScale(1.75f);
+	coins->setPosition(Vec2(bg->getContentSize().width/2 - 75,(bg->getContentSize().height * .40f)));
+    coins->setScale(.5f);
 	bg->addChild(coins);
-
-	auto noLabel = LabelTTF::create("3461", "Futura-CondensedExtraBold", 22);
-	noLabel->setAnchorPoint(Vec2(0,0));
-	noLabel->setPosition(Vec2(coins->getPositionX()+ coins->getContentSize().width + 10,bg->getContentSize().height - 140));
-	noLabel->setColor(Color3B::BLACK);
-	bg->addChild(noLabel);
+    
+    auto pearl = Sprite::create("pearl2.png");
+	pearl->setAnchorPoint(Vec2(0,0));
+	pearl->setPosition(Vec2(bg->getContentSize().width/2 - 80,(bg->getContentSize().height * .10f)));
+    pearl->setScale(.5f);
+	bg->addChild(pearl);
 
 	auto replayLabel = LabelTTF::create("Replay", "Futura-CondensedExtraBold", 25);
 	replayLabel->setAnchorPoint(Vec2(0,0));
@@ -96,9 +103,10 @@ bool GameSummaryLayer::init()
 	return true;
 }
 
-void GameSummaryLayer::setData(int* data) {
-    _meterLabel->setString(std::to_string(data[0]));
-    _earnedCoinsLabel->setString(std::to_string(data[1]));
+void GameSummaryLayer::setData(GameSummaryData* data) {
+    _meterLabel->setString(std::to_string(data->totalMeters).append(" Meters"));
+    _earnedCoinsLabel->setString(std::to_string(data->totalCoins));
+    _earnedPearlLabel->setString(std::to_string(data->totalPearl));
 }
 
 void GameSummaryLayer::onPlayAgain(Ref* pSender)

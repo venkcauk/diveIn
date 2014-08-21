@@ -1,5 +1,6 @@
 #include "DiveInScene.h"
 #include "CustomEvent.h"
+#include "GameSummaryData.h"
 
 USING_NS_CC;
 
@@ -199,8 +200,9 @@ void DiveInScene::onDiveInTriggred(EventCustom* event)
 
 void DiveInScene::onGameSummaryTriggred(EventCustom* event) {
 
-   // int *data = static_cast<int*>(event->getUserData());
-   // popupLayer->gameSummaryData = data;
+    GameSummaryData *data = static_cast<GameSummaryData*>(event->getUserData());
+    popupLayer->gameSummaryData = data;
+
     popupLayer->setVisible(true);
     popupLayer->showPopup(PopupLayer::POPUP_TYPE::GAME_SUMMARY);
     

@@ -305,6 +305,9 @@
 		D1CF9A00197C175F00025C4B /* pf2_1.png in Resources */ = {isa = PBXBuildFile; fileRef = D1CF99FD197C175F00025C4B /* pf2_1.png */; };
 		D1CF9A01197C175F00025C4B /* pf3_1.png in Resources */ = {isa = PBXBuildFile; fileRef = D1CF99FE197C175F00025C4B /* pf3_1.png */; };
 		D1CF9A03197C195D00025C4B /* pf3_item7_1.png in Resources */ = {isa = PBXBuildFile; fileRef = D1CF9A02197C195D00025C4B /* pf3_item7_1.png */; };
+		D1F7422519A0E8E300BB8DE2 /* GameSummaryData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D1F7422319A0E8E300BB8DE2 /* GameSummaryData.cpp */; };
+		D1F7422A19A0EE6100BB8DE2 /* coin2.png in Resources */ = {isa = PBXBuildFile; fileRef = D1F7422819A0EE6100BB8DE2 /* coin2.png */; };
+		D1F7422B19A0EE6100BB8DE2 /* pearl2.png in Resources */ = {isa = PBXBuildFile; fileRef = D1F7422919A0EE6100BB8DE2 /* pearl2.png */; };
 		D44C620C132DFF330009C878 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620B132DFF330009C878 /* OpenAL.framework */; };
 		D44C620E132DFF430009C878 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620D132DFF430009C878 /* AVFoundation.framework */; };
 		D44C6210132DFF4E0009C878 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D44C620F132DFF4E0009C878 /* AudioToolbox.framework */; };
@@ -755,6 +758,10 @@
 		D1CF99FD197C175F00025C4B /* pf2_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pf2_1.png; sourceTree = "<group>"; };
 		D1CF99FE197C175F00025C4B /* pf3_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pf3_1.png; sourceTree = "<group>"; };
 		D1CF9A02197C195D00025C4B /* pf3_item7_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pf3_item7_1.png; sourceTree = "<group>"; };
+		D1F7422319A0E8E300BB8DE2 /* GameSummaryData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GameSummaryData.cpp; path = ../Classes/GameSummaryData.cpp; sourceTree = "<group>"; };
+		D1F7422419A0E8E300BB8DE2 /* GameSummaryData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GameSummaryData.h; path = ../Classes/GameSummaryData.h; sourceTree = "<group>"; };
+		D1F7422819A0EE6100BB8DE2 /* coin2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = coin2.png; sourceTree = "<group>"; };
+		D1F7422919A0EE6100BB8DE2 /* pearl2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = pearl2.png; sourceTree = "<group>"; };
 		D44C620B132DFF330009C878 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		D44C620D132DFF430009C878 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		D44C620F132DFF4E0009C878 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -849,6 +856,8 @@
 				D1CF99AD197BA87300025C4B /* CustomEvent.h */,
 				D16B68EA198A7255006D7570 /* FloatingItems.cpp */,
 				D16B68EB198A7255006D7570 /* FloatingItems.h */,
+				D1F7422319A0E8E300BB8DE2 /* GameSummaryData.cpp */,
+				D1F7422419A0E8E300BB8DE2 /* GameSummaryData.h */,
 			);
 			name = Classes;
 			path = ../classes;
@@ -964,6 +973,8 @@
 		78C7DDAA14EBA5050085D0C2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D1F7422819A0EE6100BB8DE2 /* coin2.png */,
+				D1F7422919A0EE6100BB8DE2 /* pearl2.png */,
 				D101A2A419976F940078E7A2 /* obs_1_2.png */,
 				D101A2A519976F940078E7A2 /* obs_1_3.png */,
 				D101A2A619976F940078E7A2 /* obs_1_4.png */,
@@ -1446,6 +1457,7 @@
 				D17EA08419966EED00B764B2 /* coll_pearl_efx_1.png in Resources */,
 				D101A2C919976F950078E7A2 /* obs_1_4.png in Resources */,
 				D15B39A9198E0A2800F241D1 /* coll_efx_2.png in Resources */,
+				D1F7422A19A0EE6100BB8DE2 /* coin2.png in Resources */,
 				5087E78317EB970100C73F5D /* Icon-152.png in Resources */,
 				D1CF99F3197C0A9600025C4B /* pf3_item1_1.png in Resources */,
 				D15B39DA198E0A8900F241D1 /* wave01_25.png in Resources */,
@@ -1565,6 +1577,7 @@
 				D1CF9984197A4E5B00025C4B /* sound1_00.png in Resources */,
 				D17EA08219966EED00B764B2 /* coll_pearl_bgfx_11.png in Resources */,
 				D15B39B3198E0A2800F241D1 /* coll_pearl_1.png in Resources */,
+				D1F7422B19A0EE6100BB8DE2 /* pearl2.png in Resources */,
 				D1CF9A03197C195D00025C4B /* pf3_item7_1.png in Resources */,
 				D15B3997198E0A2800F241D1 /* coll_bgfx_3.png in Resources */,
 				5087E78217EB970100C73F5D /* Icon-144.png in Resources */,
@@ -1645,6 +1658,7 @@
 			files = (
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				D1CF98F9197A4E3000025C4B /* ItemSelectionLayer.cpp in Sources */,
+				D1F7422519A0E8E300BB8DE2 /* GameSummaryData.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				1AFAF8B716D35DE700DB1158 /* AppDelegate.cpp in Sources */,
 				D1CF98FD197A4E3000025C4B /* PopupLayer.cpp in Sources */,

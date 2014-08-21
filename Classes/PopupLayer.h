@@ -6,6 +6,7 @@
 #include "OptionLayer.h"
 #include "ItemSelectionLayer.h"
 #include "GameSummaryLayer.h"
+#include "GameSummaryData.h"
 
 class PopupLayer : public cocos2d::Layer
 {
@@ -32,7 +33,7 @@ public:
 	bool isVisible;
 	int totalVisiblePoup;
     
-    int *gameSummaryData;
+    GameSummaryData *gameSummaryData;
 
 	POPUP_TYPE currentPopupID;
 
